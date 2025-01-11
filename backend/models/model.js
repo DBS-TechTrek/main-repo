@@ -12,6 +12,16 @@ export async function getBalance(companyId) {
   return rows; // Return the result of the query
 }
 
+export async function getAllOutstandingRequests(companyId) {
+  // Query the database for companyName, carbonBalance, and cashBalance
+  const [rows] = await db.promise().query(
+    "SELECT ca.companyName, orq.createdDatetime AS requestDate, orq.carbonUnitPrice, orq.carbonQuantity, orq.requestReason, orq.requestType FROM outstandingRequest orq JOIN companyAccount ca ON orq.companyId = ca.companyID WHERE orq.companyId != ?",
+    [companyId] // Pass the companyId as a parameter
+  );
+
+  return rows; // Return the result of the query
+}
+
 export async function editRequest({
   requestId,
   companyId,
