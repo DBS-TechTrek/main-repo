@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const RequestReceivedPage = () => {
+const RequestsReceived = () => {
   const [requests, setRequests] = useState([]);
   const [selectedRequests, setSelectedRequests] = useState([]);
 
