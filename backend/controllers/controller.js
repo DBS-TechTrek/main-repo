@@ -215,17 +215,49 @@ export async function controllerDeleteRequest(req, res) {
 }
 
 export async function controllerUpdateStatus(req, res) {
-  console.log("req.params:", req.params);
-  const { id } = req.params;
-  const { stat } = req.body;
   try {
-    const result = await updateStatus(id, stat)
-    if (!result) {
-      return res.status(404).send("request not found");
+    // Extract input from the request body
+    const requestId = req.params.id;
+    console.log(requestId)
+    const {
+      companyId,
+      requestorCompanyId,
+      carbonUnitPrice,
+      carbonQuantity,
+      requestReason,
+      requestStatus,
+      requestType,
+    } = req.body;
+
+    // Validate required fields
+    if (!requestId) {
+      return res.status(400).json({ error: "requestId is required" });
     }
-    res.send(result)
-  } catch (err) {
-    console.error("Error fetching request:", err);
-    res.status(500).send("Failed to fetch request");
+
+    // Call the model function to update the request
+    const result = await updateStatus({
+      requestId,
+      companyId,
+      requestorCompanyId,
+      carbonUnitPrice,
+      carbonQuantity,
+      requestReason,
+      requestStatus,
+      requestType,
+    });
+
+    // Check if any rows were affected (i.e., if the record was updated)
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Request not found or no changes made" });
+    }
+
+    // Respond with success
+    return res.status(200).json({ message: "Request updated successfully" });
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Error handling updateStatus:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
