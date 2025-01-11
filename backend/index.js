@@ -1,6 +1,7 @@
 import express from "express";
 import db from "./database.js"; // Import the database connection
 import cors from "cors";
+import routes from "./routes/routes.js"; // Import the routes
 
 const app = express();
 // Define a port
@@ -26,11 +27,11 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something broke!");
 });
-
+app.use("/", routes);
 // Create a basic route
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello, World!");
+// });
 
 // Start the server
 app.listen(PORT, () => {
