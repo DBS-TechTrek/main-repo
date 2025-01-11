@@ -73,8 +73,9 @@ const LandingPage = () => {
         await api.post("/createRequest", formData);
       }
       setFormData({
+        companyName: username,
         requestDate: "",
-        companyName: "",
+        requestorCompanyName: "",
         carbonUnitPrice: "",
         carbonQuantity: "",
         requestReason: "",
@@ -97,7 +98,7 @@ const LandingPage = () => {
       requestReason: request.requestReason,
       requestType: request.requestType,
     });
-    setEditingRequestId(request.id);
+    setEditingRequestId(request.companyName);
   };
 
   const handleDelete = async (id) => {
@@ -253,7 +254,7 @@ const LandingPage = () => {
                     </button>
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded"
-                      onClick={() => handleDelete(req.companyName)}
+                      onClick={() => handleDelete(req.id)}
                     >
                       Delete
                     </button>

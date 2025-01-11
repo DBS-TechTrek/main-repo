@@ -26,6 +26,7 @@ export async function getAllOutstandingRequests(companyName) {
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
     `SELECT ca.companyName, 
+    orq.id,
     orq.createdDatetime AS requestDate, 
     orq.carbonUnitPrice, 
     orq.carbonQuantity, 
