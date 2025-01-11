@@ -70,17 +70,18 @@ const LandingPage = () => {
       if (editingRequestId) {
         await api.put(`/editRequest/${editingRequestId}`, formData);
       } else {
-        await api.post("/createRequest", formData);
+        console.log(formData)
+        const companyName = username
+        await api.post("/createRequest", formData, companyName);
       }
       setFormData({
-        companyName: username,
-        requestDate: "",
         requestorCompanyName: "",
         carbonUnitPrice: "",
         carbonQuantity: "",
         requestReason: "",
         requestType: "Buy",
       });
+      
       setEditingRequestId(null);
       const response = await api.get(`/companyOutstandingRequests/${username}`);
       setRequests(response.data);
@@ -126,17 +127,6 @@ const LandingPage = () => {
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Create or Edit Request</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-medium">Request Date</label>
-            <input
-              type="date"
-              name="requestDate"
-              value={formData.requestDate}
-              onChange={handleInputChange}
-              className="border border-gray-300 p-2 w-full"
-              required
-            />
-          </div>
           <div>
             <label className="block font-medium">Company Name</label>
             <input

@@ -28,8 +28,8 @@ router.get(
 );
 router.put("/editRequest/:id", controllerEditRequest);
 router.post("/createRequest", controllerCreateRequest);
-router.delete("/deleteRequest/:id", controllerDeleteRequest);
 router.post("/login", controllerLogin);
+router.delete("/deleteRequest/:companyName", controllerDeleteRequest);
 router.put("/updateStatus/:id", controllerUpdateStatus);
 
 export default router;

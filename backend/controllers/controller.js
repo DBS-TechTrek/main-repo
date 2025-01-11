@@ -7,6 +7,8 @@ import {
   getCompanyName,
   updateStatus,
   getOtherOutstandingRequests,
+  getOtherOutstandingRequests,
+  getCompanyId,
 } from "../models/model.js";
 
 import jwt from "jsonwebtoken";
@@ -117,10 +119,12 @@ export async function controllerCreateRequest(req, res) {
   try {
     // TOCOMPLETE: Extract data from the request body
     const {
-      companyId,
+      //Changed - Get ID
+      companyName,
       requestReason,
       carbonUnitPrice,
-      requestorCompanyId,
+      //Changed - Get ID
+      requestorCompanyName,
       requestType,
       createdDatetime,
       carbonQuantity,
@@ -129,13 +133,12 @@ export async function controllerCreateRequest(req, res) {
 
     // TOCOMPLETE: Validate the data (optional, depending on your use case)
     if (
-      !companyId ||
+      !companyName ||
       !requestReason ||
       !carbonUnitPrice ||
-      !requestorCompanyId ||
+      !requestorCompanyName ||
       !requestStatus ||
       !requestType ||
-      !createdDatetime ||
       !carbonQuantity
     ) {
       return res.status(400).json({ error: "Missing information" });
@@ -143,13 +146,12 @@ export async function controllerCreateRequest(req, res) {
 
     // TOCOMPLETE: Call the model function to create data (assumed to be a database insert)
     const newRequest = await createRequest({
-      companyId,
+      companyName,
       requestReason,
       carbonUnitPrice,
-      requestorCompanyId,
+      requestorCompanyName,
       requestStatus,
       requestType,
-      createdDatetime,
       carbonQuantity,
     });
 
@@ -211,10 +213,11 @@ export async function controllerEditRequest(req, res) {
 }
 
 export async function controllerDeleteRequest(req, res) {
-  console.log("req.params:", req.params);
-  const { id } = req.params;
+  //console.log("req.params:", req.params);
+  const { companyName } = req.params;
   try {
-    const result = await deleteRequest(id);
+    console.log(companyName);
+    const result = await deleteRequest(companyName);
     if (!result) {
       return res.status(404).send("request not found");
     }

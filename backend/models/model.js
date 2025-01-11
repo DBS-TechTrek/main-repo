@@ -13,11 +13,14 @@ export async function getBalance(companyName) {
 }
 
 export async function getCompanyId(companyName) {
+  console.log("Get Company ID");
   const [companyId] = await db
     .promise()
     .query("SELECT companyId FROM companyaccount WHERE companyName = ?", [
       companyName,
     ]);
+  console.log(companyId);
+  console.log("Get Company ID");
   return companyId;
 }
 
@@ -106,29 +109,41 @@ export async function editRequest({
   }
 }
 
-export async function deleteRequest(id) {
+export async function deleteRequest(companyName) {
+  const companyIdObject = await getCompanyId(companyName);
+  const companyId = companyIdObject[0].companyId;
+  console.log("deleteRequest");
+  console.log(companyId);
+  console.log("deleteRequest");
   const [result] = await db.promise().query(
     `DELETE FROM outstandingrequest 
           WHERE id = ?`,
-    [id]
+    [companyId]
   );
   if (result.affectedRows === 0) {
-    throw new Error(`Request with id ${id} not found`);
+    throw new Error(`Request with id ${companyId} not found`);
   }
-  return { message: `Request with id ${id} successfully deleted` };
+  return { message: `Request with id ${companyId} successfully deleted` };
 }
 
 export async function createRequest(data) {
   const {
-    companyId,
+    companyName,
     requestReason,
     carbonUnitPrice,
-    requestorCompanyId,
+    requestorCompanyName,
     requestStatus,
     requestType,
-    createdDatetime,
     carbonQuantity,
   } = data;
+
+  const companyIdObject = await getCompanyId(companyName);
+  const companyId = companyIdObject[0].companyId;
+  const requestorCompanyIdObject = await getCompanyId(requestorCompanyName);
+  const requestorCompanyId = requestorCompanyIdObject[0].companyId;
+  const currentDate = new Date();
+  const createdDatetime = new Date(currentDate.getTime());
+
 
   // SQL query to insert new user into the "outstandingrequest" table
   const queryForOutstandingRequest =
