@@ -1,9 +1,9 @@
-import { getBalance, editRequest, deleteRequest } from "../models/model.js";
 import {
   getBalance,
   editRequest,
   getAllOutstandingRequests,
   createRequest,
+  deleteRequest,
 } from "../models/model.js";
 
 // Controller function to get balance for a specific company from the request body
