@@ -19,10 +19,10 @@ function Layout() {
         <div className="nav-left">
           <div className="nav-brand">Carbon Credit Trading</div>
           <div className="nav-links">
-            <NavLink to="/dashboard" className={({ isActive }) => 
+            <NavLink to="/landing" className={({ isActive }) => 
               isActive ? 'nav-link active' : 'nav-link'
             }>
-              Dashboard
+              Home
             </NavLink>
             <NavLink to="/requests" className={({ isActive }) => 
               isActive ? 'nav-link active' : 'nav-link'
