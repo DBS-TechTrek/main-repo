@@ -127,7 +127,6 @@ export async function controllerCreateRequest(req, res) {
       !requestorCompanyName ||
       !requestStatus ||
       !requestType ||
-      !createdDatetime ||
       !carbonQuantity
     ) {
       return res.status(400).json({ error: "Missing information" });
@@ -141,7 +140,6 @@ export async function controllerCreateRequest(req, res) {
       requestorCompanyName,
       requestStatus,
       requestType,
-      createdDatetime,
       carbonQuantity,
     });
 

@@ -135,7 +135,6 @@ export async function createRequest(data) {
     requestorCompanyName,
     requestStatus,
     requestType,
-    createdDatetime,
     carbonQuantity,
   } = data;
 
@@ -143,6 +142,8 @@ export async function createRequest(data) {
   const companyId = companyIdObject[0].companyId;
   const requestorCompanyIdObject = await getCompanyId(requestorCompanyName);
   const requestorCompanyId = requestorCompanyIdObject[0].companyId;
+  const currentDate = new Date();
+  const createdDatetime = new Date(currentDate.getTime());
 
 
   // SQL query to insert new user into the "outstandingrequest" table
