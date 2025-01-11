@@ -5,7 +5,8 @@ import {
   controllerEditRequest,
   controllerGetAllOutstandingRequests,
   controllerDeleteRequest,
-  controllerUpdateStatus
+  controllerUpdateStatus,
+  controllerGetOtherOutstandingRequests
 } from "../controllers/controller.js";
 
 const router = express.Router();
@@ -16,6 +17,10 @@ router.get("/companyBalance/:companyName", controllerGetBalance); // GET /notes
 router.get(
   "/companyOutstandingRequests/:companyName",
   controllerGetAllOutstandingRequests
+);
+router.get(
+  "/otherCompanyOutstandingRequests/:companyName",
+  controllerGetOtherOutstandingRequests
 );
 router.put("/editRequest/:id", controllerEditRequest);
 router.post("/createRequest", controllerCreateRequest);
