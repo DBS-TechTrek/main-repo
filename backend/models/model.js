@@ -20,13 +20,42 @@ export async function getCompanyId(companyName) {
     ]);
   return companyId;
 }
+
 export async function getAllOutstandingRequests(companyName) {
+  const companyId = await getCompanyId(companyName);  
+  // Query the database for companyName, carbonBalance, and cashBalance
+  const [rows] = await db.promise().query(
+    `SELECT ca.companyName, 
+    orq.createdDatetime AS requestDate, 
+    orq.carbonUnitPrice, 
+    orq.carbonQuantity, 
+    orq.requestReason, 
+    orq.requestType FROM 
+    outstandingRequest orq 
+    JOIN companyAccount ca 
+    ON orq.companyId = ca.companyId 
+    WHERE orq.companyId = ?`,
+    [companyId[0].companyId] // Pass the companyId as a parameter
+  );
+  return rows; // Return the result of the query
+}
+
+export async function getOtherOutstandingRequests(companyName) {
   const companyId = await getCompanyId(companyName);
   console.log(companyId);
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
-    "SELECT ca.companyName, orq.createdDatetime AS requestDate, orq.carbonUnitPrice, orq.carbonQuantity, orq.requestReason, orq.requestType FROM outstandingRequest orq JOIN companyAccount ca ON orq.companyId = ca.companyID WHERE orq.companyId != ?",
-    [companyId] // Pass the companyId as a parameter
+    `SELECT ca.companyName, 
+    orq.createdDatetime AS requestDate, 
+    orq.carbonUnitPrice, 
+    orq.carbonQuantity, 
+    orq.requestReason, 
+    orq.requestType FROM 
+    outstandingRequest orq 
+    JOIN companyAccount ca 
+    ON orq.companyId = ca.companyId 
+    WHERE orq.companyId != ?`,
+    [companyId[0].companyId] // Pass the companyId as a parameter
   );
 
   return rows; // Return the result of the query
@@ -101,15 +130,15 @@ export async function createRequest(data) {
     carbonQuantity,
   } = data;
 
-  // SQL query to insert new user into the "users" table
-  const query =
+  // SQL query to insert new user into the "outstandingrequest" table
+  const queryForOutstandingRequest =
     "INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   try {
     // Use the promise-based query method to execute the query
     const [result] = await db
       .promise()
-      .query(query, [
+      .query(queryForOutstandingRequest, [
         companyId,
         requestReason,
         carbonUnitPrice,
@@ -119,6 +148,27 @@ export async function createRequest(data) {
         createdDatetime,
         carbonQuantity,
       ]);
+
+    const requestId = result.insertId;
+    console.log(requestId);
+    //Not sure if this logic is right?
+    const currentDate = new Date();
+    const alertDateTime = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    console.log(alertDateTime);
+    const alertStatus = "Scheduled";
+    const alertText = "";
+    const queryForRequestReceived =
+      "INSERT INTO requestreceived (requestId, alertDateTime, alertStatus, alertText) VALUES (?, ?, ?, ?)";
+
+    const [resultForReceivedRequest] = await db
+      .promise()
+      .query(queryForRequestReceived, [
+        requestId,
+        alertDateTime,
+        alertStatus,
+        alertText,
+      ]);
+
 
     // Return the created user with the generated id (from the result)
     return {
@@ -135,5 +185,23 @@ export async function createRequest(data) {
   } catch (error) {
     console.error("Error creating data:", error);
     throw new Error("Error saving request to the database");
+  }
+}
+
+export async function updateStatus(id, stat) {
+  const query = `
+  UPDATE outstandingrequest
+  SET requestStatus=?
+  WHERE id=?`
+  
+  try {
+    const [result] = await db
+    .promise()
+    .query(query, [stat, id])
+
+    return result
+  } catch (err) {
+    console.error("Error updating data:", error)
+    throw new Error("Error saving status to database")
   }
 }

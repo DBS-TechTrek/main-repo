@@ -4,6 +4,8 @@ import {
   getAllOutstandingRequests,
   createRequest,
   deleteRequest,
+  updateStatus,
+  getOtherOutstandingRequests
 } from "../models/model.js";
 
 // Controller function to get balance for a specific company from the request body
@@ -57,6 +59,37 @@ export async function controllerGetAllOutstandingRequests(req, res) {
     // Check if a result exists
     if (balance.length === 0) {
       return res.status(404).json({ error: "Company not found" });
+    }
+
+    // Respond with the retrieved balance
+    return res.status(200).json(balance);
+  } catch (error) {
+    // Handle errors (e.g., database issues)
+    console.error("Error fetching company balance:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function controllerGetOtherOutstandingRequests(req, res) {
+  try {
+    // Extract companyId from the request params
+    console.log("Before req params");
+    const companyName = req.params.companyName;
+    console.log(req.params.companyName);
+
+    // Validate that companyId is provided
+    if (!companyName) {
+      return res
+        .status(400)
+        .json({ error: "companyName is required in the request body" });
+    }
+
+    // Fetch the balance from the model
+    const balance = await getOtherOutstandingRequests(companyName);
+
+    // Check if a result exists
+    if (balance.length === 0) {
+      return res.status(404).json({ error: "Companies not found" });
     }
 
     // Respond with the retrieved balance
@@ -175,6 +208,22 @@ export async function controllerDeleteRequest(req, res) {
       return res.status(404).send("request not found");
     }
     res.send(result);
+  } catch (err) {
+    console.error("Error fetching request:", err);
+    res.status(500).send("Failed to fetch request");
+  }
+}
+
+export async function controllerUpdateStatus(req, res) {
+  console.log("req.params:", req.params);
+  const { id } = req.params;
+  const { stat } = req.body;
+  try {
+    const result = await updateStatus(id, stat)
+    if (!result) {
+      return res.status(404).send("request not found");
+    }
+    res.send(result)
   } catch (err) {
     console.error("Error fetching request:", err);
     res.status(500).send("Failed to fetch request");
