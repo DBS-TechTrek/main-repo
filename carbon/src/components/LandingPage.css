@@ -1,0 +1,104 @@
+/* src/components/LandingPage.css */
+.landing-container {
+    min-height: 100vh;
+    background-color: #f5f7fa;
+  }
+  
+  .landing-nav {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .nav-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .welcome-text {
+    color: #2c3e50;
+  }
+  
+  .logout-button {
+    padding: 0.5rem 1rem;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .logout-button:hover {
+    background-color: #c0392b;
+  }
+  
+  .dashboard-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  .dashboard-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-card h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+  
+  .balance {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2980b9;
+    margin-bottom: 0.5rem;
+  }
+  
+  .requests-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .requests-section h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+  
+  .requests-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .requests-table th,
+  .requests-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .requests-table th {
+    font-weight: 600;
+    color: #7f8c8d;
+  }
+  
+  .requests-table tr:hover {
+    background-color: #f8f9fa;
+  }
