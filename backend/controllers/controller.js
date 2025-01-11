@@ -1,4 +1,4 @@
-import { getBalance, editRequest, getAllOutstandingRequests } from "../models/model.js";
+import { getBalance, editRequest, getAllOutstandingRequests, createRequest } from "../models/model.js";
 
 // Controller function to get balance for a specific company from the request body
 export async function controllerGetBalance(req, res) {
@@ -61,6 +61,33 @@ export async function controllerGetAllOutstandingRequests(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
+
+  // Controller function to get balance for a specific company from the request body
+export async function controllerCreateRequest(req, res) {
+  try {
+
+    // TOCOMPLETE: Extract data from the request body
+    const { companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestType, createdDatetime, carbonQuantity } = req.body;
+    const requestStatus = 'Pending';
+
+    // TOCOMPLETE: Validate the data (optional, depending on your use case)
+    if (!companyId || !requestReason || !carbonUnitPrice || !requestorCompanyId || !requestStatus || !requestType || !createdDatetime || !carbonQuantity) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+  
+    // TOCOMPLETE: Call the model function to create data (assumed to be a database insert)
+    const newRequest = await createRequest({ companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity });
+
+
+    // Respond with the retrieved balance
+    return res.status(200).json(newRequest);
+  } catch (error) {
+    // Handle errors (e.g., database issues)
+    console.error("Error creating request:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 
 // Controller function to handle editing a request
 export async function controllerEditRequest(req, res) {
