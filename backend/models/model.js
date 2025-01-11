@@ -56,3 +56,15 @@ export async function editRequest({
     throw error;
   }
 }
+
+export async function deleteRequest(id) {
+  const [result] = await db.promise().query(
+    `DELETE FROM outstandingrequest 
+          WHERE id = ?`,
+    [id]
+  );
+  if (result.affectedRows === 0) {
+    throw new Error(`Request with id ${id} not found`);
+  }
+  return { message: `Request with id ${id} successfully deleted` };
+}

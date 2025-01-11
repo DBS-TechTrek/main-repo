@@ -1,4 +1,4 @@
-import { getBalance, editRequest } from "../models/model.js";
+import { getBalance, editRequest, deleteRequest } from "../models/model.js";
 
 // Controller function to get balance for a specific company from the request body
 export async function controllerGetBalance(req, res) {
@@ -75,5 +75,20 @@ export async function controllerEditRequest(req, res) {
     // Handle unexpected errors
     console.error("Error handling editRequest:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function controllerDeleteRequest(req, res) {
+  console.log("req.params:", req.params);
+  const { id } = req.params;
+  try {
+    const result = await deleteRequest(id);
+    if (!result) {
+      return res.status(404).send("request not found");
+    }
+    res.send(result);
+  } catch (err) {
+    console.error("Error fetching request:", err);
+    res.status(500).send("Failed to fetch request");
   }
 }
