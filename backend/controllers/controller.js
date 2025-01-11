@@ -4,26 +4,30 @@ import {
   getAllOutstandingRequests,
   createRequest,
   deleteRequest,
+  getCompanyName,
   updateStatus,
+  getOtherOutstandingRequests,
   getOtherOutstandingRequests,
   getCompanyId,
 } from "../models/model.js";
 
+import jwt from "jsonwebtoken";
+
 // Controller function to get balance for a specific company from the request body
 export async function controllerGetBalance(req, res) {
   try {
-    // Extract companyId from the request params
-    const companyName = req.params.companyName;
-    console.log("getBalance call,", companyName);
-    // Validate that companyId is provided
-    if (!companyName) {
-      return res
-        .status(400)
-        .json({ error: "companyId is required in the request body" });
+    const companyNameFromToken = req.companyName; // Extracted from token
+    const companyNameFromParams = req.params.companyName;
+
+    // Ensure the token's companyName matches the URL parameter
+    if (companyNameFromToken !== companyNameFromParams) {
+      return res.status(403).json({
+        error: "Unauthorized: You can only access your own company's balance",
+      });
     }
 
     // Fetch the balance from the model
-    const balance = await getBalance(companyName);
+    const balance = await getBalance(companyNameFromToken);
 
     // Check if a result exists
     if (balance.length === 0) {
@@ -46,7 +50,15 @@ export async function controllerGetAllOutstandingRequests(req, res) {
     console.log("Before req params");
     const companyName = req.params.companyName;
     console.log(req.params.companyName);
+    const companyNameFromToken = req.companyName; // Extracted from token
+    const companyNameFromParams = req.params.companyName;
 
+    // Ensure the token's companyName matches the URL parameter
+    if (companyNameFromToken !== companyNameFromParams) {
+      return res.status(403).json({
+        error: "Unauthorized: You can only access your own company's balance",
+      });
+    }
     // Validate that companyId is provided
     if (!companyName) {
       return res
@@ -216,11 +228,36 @@ export async function controllerDeleteRequest(req, res) {
   }
 }
 
+export async function controllerLogin(req, res) {
+  const body = req.body;
+  const companyName = body.username;
+  console.log("username is", body.username);
+  console.log("password is ", body.password);
+
+  // Checking if the user entered the correct username/password combo
+  try {
+    const result = await getCompanyName(body.username);
+    if (!result) {
+      return res.status(404).send("request not found");
+    }
+    if (body.password === result.password) {
+      console.log("Passwords match");
+      const jsontoken = jwt.sign({ companyName }, "qwe1234", {
+        expiresIn: "1h",
+      });
+      res.send(jsontoken);
+    }
+  } catch (err) {
+    console.error("Error fetching request:", err);
+    res.status(500).send("Failed to fetch request");
+  }
+}
+
 export async function controllerUpdateStatus(req, res) {
   try {
     // Extract input from the request body
     const requestId = req.params.id;
-    console.log(requestId)
+    console.log(requestId);
     const {
       companyId,
       requestorCompanyId,

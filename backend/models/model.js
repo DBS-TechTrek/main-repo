@@ -25,11 +25,11 @@ export async function getCompanyId(companyName) {
 }
 
 export async function getAllOutstandingRequests(companyName) {
-  const companyId = await getCompanyId(companyName);  
+  const companyId = await getCompanyId(companyName);
+  console.log(companyId);
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
     `SELECT ca.companyName, 
-    orq.id,
     orq.createdDatetime AS requestDate, 
     orq.carbonUnitPrice, 
     orq.carbonQuantity, 
@@ -38,12 +38,12 @@ export async function getAllOutstandingRequests(companyName) {
     outstandingRequest orq 
     JOIN companyAccount ca 
     ON orq.companyId = ca.companyId 
-    WHERE orq.companyId = ?`,
+    WHERE orq.companyId != ?`,
     [companyId[0].companyId] // Pass the companyId as a parameter
   );
+
   return rows; // Return the result of the query
 }
-
 export async function getOtherOutstandingRequests(companyName) {
   const companyId = await getCompanyId(companyName);
   console.log(companyId);
@@ -64,7 +64,6 @@ export async function getOtherOutstandingRequests(companyName) {
 
   return rows; // Return the result of the query
 }
-
 export async function editRequest({
   requestId,
   companyId,
@@ -169,7 +168,9 @@ export async function createRequest(data) {
     console.log(requestId);
     //Not sure if this logic is right?
     const currentDate = new Date();
-    const alertDateTime = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const alertDateTime = new Date(
+      currentDate.getTime() + 7 * 24 * 60 * 60 * 1000
+    );
     console.log(alertDateTime);
     const alertStatus = "Scheduled";
     const alertText = "";
@@ -184,7 +185,6 @@ export async function createRequest(data) {
         alertStatus,
         alertText,
       ]);
-
 
     // Return the created user with the generated id (from the result)
     return {
@@ -204,61 +204,89 @@ export async function createRequest(data) {
   }
 }
 
-export async function updateStatus({requestId,
+export async function getCompanyName(companyName) {
+  // Query the database for companyName, carbonBalance, and cashBalance
+  const [rows] = await db.promise().query(
+    `SELECT * 
+    FROM companyaccount
+    WHERE companyName = ?`,
+    [companyName] // Pass the companyINameas a parameter
+  );
+  console.log(rows[0]);
+  return rows[0]; // Return the result of the query
+}
+
+export async function updateStatus({
+  requestId,
   companyId,
   requestorCompanyId,
   carbonUnitPrice,
   carbonQuantity,
   requestReason,
   requestStatus,
-  requestType}) {
+  requestType,
+}) {
   const query = `
   UPDATE outstandingrequest
   SET requestStatus=?
-  WHERE id=?`
-  
+  WHERE id=?`;
+
   const query2 = `
   UPDATE companyaccount
   SET carbonBalance = carbonBalance + ?,
   cashBalance = cashBalance - ?
-  WHERE companyId= ?`
+  WHERE companyId= ?`;
 
   const query3 = `
   UPDATE companyaccount
   SET carbonBalance = carbonBalance - ?,
   cashBalance = cashBalance + ?
-  WHERE companyId= ?`
+  WHERE companyId= ?`;
 
   try {
     const [result] = await db
-    .promise()
-    .query(query, [requestStatus, requestId])
-
+      .promise()
+      .query(query, [requestStatus, requestId]);
 
     if (requestStatus === "Approved") {
       if (requestType === "Buy") {
         const [result1] = await db
-        .promise()
-        .query(query2, [carbonQuantity, carbonQuantity*carbonUnitPrice, requestorCompanyId])
+          .promise()
+          .query(query2, [
+            carbonQuantity,
+            carbonQuantity * carbonUnitPrice,
+            requestorCompanyId,
+          ]);
 
         const [result2] = await db
-        .promise()
-        .query(query3, [carbonQuantity, carbonQuantity*carbonUnitPrice, companyId])
-
+          .promise()
+          .query(query3, [
+            carbonQuantity,
+            carbonQuantity * carbonUnitPrice,
+            companyId,
+          ]);
       } else {
         const [result1] = await db
-        .promise()
-        .query(query2, [carbonQuantity, carbonQuantity*carbonUnitPrice, companyId])
+          .promise()
+          .query(query2, [
+            carbonQuantity,
+            carbonQuantity * carbonUnitPrice,
+            companyId,
+          ]);
 
         const [result2] = await db
-        .promise()
-        .query(query3, [carbonQuantity, carbonQuantity*carbonUnitPrice, requestorCompanyId])
+          .promise()
+          .query(query3, [
+            carbonQuantity,
+            carbonQuantity * carbonUnitPrice,
+            requestorCompanyId,
+          ]);
       }
     }
-    
-    return {message: "done"}
+
+    return { message: "done" };
   } catch (err) {
-    console.error("Error updating data:", err)
-    throw new Error("Error saving status to database")
+    console.error("Error updating data:", err);
+    throw new Error("Error saving status to database");
   }
 }
