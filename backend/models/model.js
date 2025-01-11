@@ -2,17 +2,27 @@ import db from "../database.js";
 
 // Asynchronous functions for interacting with the database
 
-export async function getBalance(companyId) {
+export async function getBalance(companyName) {
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
-    "SELECT companyName, carbonBalance, cashBalance FROM companyaccount WHERE companyId = ?",
-    [companyId] // Pass the companyId as a parameter
+    "SELECT companyName, carbonBalance, cashBalance FROM companyaccount WHERE companyName = ?",
+    [companyName] // Pass the companyINameas a parameter
   );
 
   return rows; // Return the result of the query
 }
 
-export async function getAllOutstandingRequests(companyId) {
+export async function getCompanyId(companyName) {
+  const [companyId] = await db
+    .promise()
+    .query("SELECT companyId FROM companyaccount WHERE companyName = ?", [
+      companyName,
+    ]);
+  return companyId;
+}
+export async function getAllOutstandingRequests(companyName) {
+  const companyId = await getCompanyId(companyName);
+  console.log(companyId);
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
     "SELECT ca.companyName, orq.createdDatetime AS requestDate, orq.carbonUnitPrice, orq.carbonQuantity, orq.requestReason, orq.requestType FROM outstandingRequest orq JOIN companyAccount ca ON orq.companyId = ca.companyID WHERE orq.companyId != ?",

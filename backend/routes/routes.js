@@ -10,8 +10,12 @@ import {
 const router = express.Router();
 
 // Routes for notes
-router.get("/companyBalance/:id", controllerGetBalance); // GET /notes
-router.get("/companyOutstandingRequests", controllerGetAllOutstandingRequests);
+//Change to companyName
+router.get("/companyBalance/:companyName", controllerGetBalance); // GET /notes
+router.get(
+  "/companyOutstandingRequests/:companyName",
+  controllerGetAllOutstandingRequests
+);
 router.put("/editRequest/:id", controllerEditRequest);
 router.post("/createRequest", controllerCreateRequest);
 router.delete("/deleteRequest/:id", controllerDeleteRequest);

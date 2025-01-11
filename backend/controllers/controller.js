@@ -10,17 +10,17 @@ import {
 export async function controllerGetBalance(req, res) {
   try {
     // Extract companyId from the request params
-    const companyId = req.params.id;
-
+    const companyName = req.params.companyName;
+    console.log("getBalance call,", companyName);
     // Validate that companyId is provided
-    if (!companyId) {
+    if (!companyName) {
       return res
         .status(400)
         .json({ error: "companyId is required in the request body" });
     }
 
     // Fetch the balance from the model
-    const balance = await getBalance(companyId);
+    const balance = await getBalance(companyName);
 
     // Check if a result exists
     if (balance.length === 0) {
@@ -41,18 +41,18 @@ export async function controllerGetAllOutstandingRequests(req, res) {
   try {
     // Extract companyId from the request params
     console.log("Before req params");
-    const companyId = req.params.id;
-    console.log(req.params.id);
+    const companyName = req.params.companyName;
+    console.log(req.params.companyName);
 
     // Validate that companyId is provided
-    if (!companyId) {
+    if (!companyName) {
       return res
         .status(400)
-        .json({ error: "companyId is required in the request body" });
+        .json({ error: "companyName is required in the request body" });
     }
 
     // Fetch the balance from the model
-    const balance = await getAllOutstandingRequests(companyId);
+    const balance = await getAllOutstandingRequests(companyName);
 
     // Check if a result exists
     if (balance.length === 0) {

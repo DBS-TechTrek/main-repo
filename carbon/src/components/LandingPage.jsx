@@ -1,13 +1,16 @@
 // src/components/LandingPage.jsx
-import React, {useState, useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
-import './LandingPage.css';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./LandingPage.css";
+import axios from "axios";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const username = localStorage.getItem('user');
-  const [balances, setBalances] = useState({ carbonBalance: 0, cashBalance: 0 });
+  const username = localStorage.getItem("user");
+  const [balances, setBalances] = useState({
+    carbonBalance: 0,
+    cashBalance: 0,
+  });
   const [requests, setRequests] = useState([]);
   const [formData, setFormData] = useState({
     requestDate: "",
@@ -19,27 +22,35 @@ const LandingPage = () => {
   });
   const [editingRequestId, setEditingRequestId] = useState(null);
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
+  const api = axios.create({
+    baseURL: "http://localhost:3000/", // Replace with your backend's base URL
+  });
   useEffect(() => {
     const fetchBalances = async () => {
       try {
-        const response = await axios.get('/api/user/balances');
+        console.log("Username is ", username);
+
+        const response = await api.get(`companyBalance/${username}`);
+        console.log("Response is ", response);
         setBalances(response.data);
       } catch (error) {
-        console.error('Error fetching balances:', error);
+        console.error("Error fetching balances:", error);
       }
     };
 
     const fetchRequests = async () => {
       try {
-        const response = await axios.get('/api/requests');
+        const response = await axios.get(
+          `/companyOutstandingRequests/${username}`
+        );
         setRequests(response.data);
       } catch (error) {
-        console.error('Error fetching requests:', error);
+        console.error("Error fetching requests:", error);
       }
     };
 
@@ -97,7 +108,6 @@ const LandingPage = () => {
     }
   };
 
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Landing Page</h1>
@@ -136,7 +146,9 @@ const LandingPage = () => {
             />
           </div>
           <div>
-            <label className="block font-medium">Carbon Price (SGD/Tonnes)</label>
+            <label className="block font-medium">
+              Carbon Price (SGD/Tonnes)
+            </label>
             <input
               type="number"
               name="carbonUnitPrice"
@@ -200,7 +212,9 @@ const LandingPage = () => {
               <tr>
                 <th className="border border-gray-300 p-2">Request Date</th>
                 <th className="border border-gray-300 p-2">Company Name</th>
-                <th className="border border-gray-300 p-2">Carbon Price (SGD/Tonnes)</th>
+                <th className="border border-gray-300 p-2">
+                  Carbon Price (SGD/Tonnes)
+                </th>
                 <th className="border border-gray-300 p-2">Carbon Quantity</th>
                 <th className="border border-gray-300 p-2">Request Reason</th>
                 <th className="border border-gray-300 p-2">Request Type</th>
@@ -210,12 +224,24 @@ const LandingPage = () => {
             <tbody>
               {requests.map((req) => (
                 <tr key={req.id} className="text-center">
-                  <td className="border border-gray-300 p-2">{req.requestDate}</td>
-                  <td className="border border-gray-300 p-2">{req.companyName}</td>
-                  <td className="border border-gray-300 p-2">{req.carbonUnitPrice}</td>
-                  <td className="border border-gray-300 p-2">{req.carbonQuantity}</td>
-                  <td className="border border-gray-300 p-2">{req.requestReason}</td>
-                  <td className="border border-gray-300 p-2">{req.requestType}</td>
+                  <td className="border border-gray-300 p-2">
+                    {req.requestDate}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {req.companyName}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {req.carbonUnitPrice}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {req.carbonQuantity}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {req.requestReason}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    {req.requestType}
+                  </td>
                   <td className="border border-gray-300 p-2">
                     <button
                       className="bg-yellow-500 text-white px-2 py-1 mr-2 rounded"
