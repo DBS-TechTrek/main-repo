@@ -6,6 +6,8 @@ import {
   controllerGetAllOutstandingRequests,
   controllerDeleteRequest,
   controllerLogin,
+  controllerUpdateStatus,
+  controllerGetOtherOutstandingRequests,
 } from "../controllers/controller.js";
 
 import { checkToken } from "../auth/checkToken.js";
@@ -20,9 +22,14 @@ router.get(
   checkToken,
   controllerGetAllOutstandingRequests
 );
+router.get(
+  "/otherCompanyOutstandingRequests/:companyName",
+  controllerGetOtherOutstandingRequests
+);
 router.put("/editRequest/:id", controllerEditRequest);
 router.post("/createRequest", controllerCreateRequest);
 router.delete("/deleteRequest/:id", controllerDeleteRequest);
 router.post("/login", controllerLogin);
+router.put("/updateStatus/:id", controllerUpdateStatus);
 
 export default router;

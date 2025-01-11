@@ -36,8 +36,8 @@ const LandingPage = () => {
         console.log("Username is ", username);
 
         const response = await api.get(`companyBalance/${username}`);
-        console.log("Response is ", response);
-        setBalances(response.data);
+        console.log("Response is ", response.data[0]);
+        setBalances(response.data[0]);
       } catch (error) {
         console.error("Error fetching balances:", error);
       }
@@ -45,9 +45,10 @@ const LandingPage = () => {
 
     const fetchRequests = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `/companyOutstandingRequests/${username}`
         );
+        console.log(response.data)
         setRequests(response.data);
       } catch (error) {
         console.error("Error fetching requests:", error);
@@ -67,20 +68,21 @@ const LandingPage = () => {
     e.preventDefault();
     try {
       if (editingRequestId) {
-        await axios.put(`/api/requests/${editingRequestId}`, formData);
+        await api.put(`/editRequest/${editingRequestId}`, formData);
       } else {
-        await axios.post("/api/requests", formData);
+        await api.post("/createRequest", formData);
       }
       setFormData({
+        companyName: username,
         requestDate: "",
-        companyName: "",
+        requestorCompanyName: "",
         carbonUnitPrice: "",
         carbonQuantity: "",
         requestReason: "",
         requestType: "Buy",
       });
       setEditingRequestId(null);
-      const response = await axios.get("/api/requests");
+      const response = await api.get(`/companyOutstandingRequests/${username}`);
       setRequests(response.data);
     } catch (error) {
       console.error("Error submitting request:", error);
@@ -96,13 +98,14 @@ const LandingPage = () => {
       requestReason: request.requestReason,
       requestType: request.requestType,
     });
-    setEditingRequestId(request.id);
+    setEditingRequestId(request.companyName);
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/requests/${id}`);
-      setRequests(requests.filter((req) => req.id !== id));
+      console.log(id)
+      await api.delete(`/deleteRequest/${id}`);
+      setRequests(requests.filter((req) => req.companyName !== id));
     } catch (error) {
       console.error("Error deleting request:", error);
     }
@@ -245,7 +248,7 @@ const LandingPage = () => {
                   <td className="border border-gray-300 p-2">
                     <button
                       className="bg-yellow-500 text-white px-2 py-1 mr-2 rounded"
-                      onClick={() => handleEdit(req)}
+                      onClick={() => handleEdit(req.companyName)}
                     >
                       Edit
                     </button>

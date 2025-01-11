@@ -5,6 +5,8 @@ import {
   createRequest,
   deleteRequest,
   getCompanyName,
+  updateStatus,
+  getOtherOutstandingRequests,
 } from "../models/model.js";
 
 import jwt from "jsonwebtoken";
@@ -68,6 +70,37 @@ export async function controllerGetAllOutstandingRequests(req, res) {
     // Check if a result exists
     if (balance.length === 0) {
       return res.status(404).json({ error: "Company not found" });
+    }
+
+    // Respond with the retrieved balance
+    return res.status(200).json(balance);
+  } catch (error) {
+    // Handle errors (e.g., database issues)
+    console.error("Error fetching company balance:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function controllerGetOtherOutstandingRequests(req, res) {
+  try {
+    // Extract companyId from the request params
+    console.log("Before req params");
+    const companyName = req.params.companyName;
+    console.log(req.params.companyName);
+
+    // Validate that companyId is provided
+    if (!companyName) {
+      return res
+        .status(400)
+        .json({ error: "companyName is required in the request body" });
+    }
+
+    // Fetch the balance from the model
+    const balance = await getOtherOutstandingRequests(companyName);
+
+    // Check if a result exists
+    if (balance.length === 0) {
+      return res.status(404).json({ error: "Companies not found" });
     }
 
     // Respond with the retrieved balance
@@ -214,5 +247,53 @@ export async function controllerLogin(req, res) {
   } catch (err) {
     console.error("Error fetching request:", err);
     res.status(500).send("Failed to fetch request");
+  }
+}
+
+export async function controllerUpdateStatus(req, res) {
+  try {
+    // Extract input from the request body
+    const requestId = req.params.id;
+    console.log(requestId);
+    const {
+      companyId,
+      requestorCompanyId,
+      carbonUnitPrice,
+      carbonQuantity,
+      requestReason,
+      requestStatus,
+      requestType,
+    } = req.body;
+
+    // Validate required fields
+    if (!requestId) {
+      return res.status(400).json({ error: "requestId is required" });
+    }
+
+    // Call the model function to update the request
+    const result = await updateStatus({
+      requestId,
+      companyId,
+      requestorCompanyId,
+      carbonUnitPrice,
+      carbonQuantity,
+      requestReason,
+      requestStatus,
+      requestType,
+    });
+
+    // Check if any rows were affected (i.e., if the record was updated)
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Request not found or no changes made" });
+    }
+
+    // Respond with success
+    return res.status(200).json({ message: "Request updated successfully" });
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Error handling updateStatus:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
