@@ -5,28 +5,31 @@ import Layout from './components/Layout';
 import Login from './components/Login';
 import LandingPage from './components/LandingPage';
 import RequestsPage from './components/RequestsPage';
-import DataPage from './components/DataPage';
+import Dataframe from './components/dataframe';
 
 function App() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/DataPage" element={<DataPage />} />
-        
-      DataPage
+        {/* Public Routes */}
         <Route path="/login" element={isLoggedIn ? <Navigate to="/landing" /> : <Login />} />
-        
+        <Route path="/dataframe" element={<Dataframe />} /> {/* Public Route for Data Page */}
+
+        {/* Protected Routes (Requires Authentication) */}
         <Route element={isLoggedIn ? <Layout /> : <Navigate to="/login" />}>
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/requests" element={<RequestsPage />} />
         </Route>
 
+        {/* Default Route */}
         <Route path="/" element={<Navigate to={isLoggedIn ? "/landing" : "/login"} />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
 
 export default App;
