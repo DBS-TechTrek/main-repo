@@ -5,7 +5,7 @@ import mysql from "mysql2";
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost", // Use environment variables or defaults
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "password",
+  password: process.env.DB_PASSWORD || " ",
   database: process.env.DB_NAME || "techtrek2025",
 });
 
