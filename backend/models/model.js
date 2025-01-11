@@ -29,6 +29,7 @@ export async function getAllOutstandingRequests(companyName) {
   // Query the database for companyName, carbonBalance, and cashBalance
   const [rows] = await db.promise().query(
     `SELECT ca.companyName, 
+    orq.id,
     orq.createdDatetime AS requestDate, 
     orq.carbonUnitPrice, 
     orq.carbonQuantity, 
@@ -202,20 +203,61 @@ export async function createRequest(data) {
   }
 }
 
-export async function updateStatus(id, stat) {
+export async function updateStatus({requestId,
+  companyId,
+  requestorCompanyId,
+  carbonUnitPrice,
+  carbonQuantity,
+  requestReason,
+  requestStatus,
+  requestType}) {
   const query = `
   UPDATE outstandingrequest
   SET requestStatus=?
   WHERE id=?`
   
+  const query2 = `
+  UPDATE companyaccount
+  SET carbonBalance = carbonBalance + ?,
+  cashBalance = cashBalance - ?
+  WHERE companyId= ?`
+
+  const query3 = `
+  UPDATE companyaccount
+  SET carbonBalance = carbonBalance - ?,
+  cashBalance = cashBalance + ?
+  WHERE companyId= ?`
+
   try {
     const [result] = await db
     .promise()
-    .query(query, [stat, id])
+    .query(query, [requestStatus, requestId])
 
-    return result
+
+    if (requestStatus === "Approved") {
+      if (requestType === "Buy") {
+        const [result1] = await db
+        .promise()
+        .query(query2, [carbonQuantity, carbonQuantity*carbonUnitPrice, requestorCompanyId])
+
+        const [result2] = await db
+        .promise()
+        .query(query3, [carbonQuantity, carbonQuantity*carbonUnitPrice, companyId])
+
+      } else {
+        const [result1] = await db
+        .promise()
+        .query(query2, [carbonQuantity, carbonQuantity*carbonUnitPrice, companyId])
+
+        const [result2] = await db
+        .promise()
+        .query(query3, [carbonQuantity, carbonQuantity*carbonUnitPrice, requestorCompanyId])
+      }
+    }
+    
+    return {message: "done"}
   } catch (err) {
-    console.error("Error updating data:", error)
+    console.error("Error updating data:", err)
     throw new Error("Error saving status to database")
   }
 }
