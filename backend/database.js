@@ -1,11 +1,11 @@
 import "dotenv/config";
 import mysql from "mysql2";
 
-// Create a database connection
+// Create a database connection!
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost", // Use environment variables or defaults
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || " ",
+  password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_NAME || "techtrek2025",
 });
 
