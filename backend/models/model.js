@@ -130,15 +130,15 @@ export async function createRequest(data) {
     carbonQuantity,
   } = data;
 
-  // SQL query to insert new user into the "users" table
-  const query =
+  // SQL query to insert new user into the "outstandingrequest" table
+  const queryForOutstandingRequest =
     "INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   try {
     // Use the promise-based query method to execute the query
     const [result] = await db
       .promise()
-      .query(query, [
+      .query(queryForOutstandingRequest, [
         companyId,
         requestReason,
         carbonUnitPrice,
@@ -148,6 +148,27 @@ export async function createRequest(data) {
         createdDatetime,
         carbonQuantity,
       ]);
+
+    const requestId = result.insertId;
+    console.log(requestId);
+    //Not sure if this logic is right?
+    const currentDate = new Date();
+    const alertDateTime = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+    console.log(alertDateTime);
+    const alertStatus = "Scheduled";
+    const alertText = "";
+    const queryForRequestReceived =
+      "INSERT INTO requestreceived (requestId, alertDateTime, alertStatus, alertText) VALUES (?, ?, ?, ?)";
+
+    const [resultForReceivedRequest] = await db
+      .promise()
+      .query(queryForRequestReceived, [
+        requestId,
+        alertDateTime,
+        alertStatus,
+        alertText,
+      ]);
+
 
     // Return the created user with the generated id (from the result)
     return {
