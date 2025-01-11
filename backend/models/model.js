@@ -137,3 +137,15 @@ export async function createRequest(data) {
     throw new Error("Error saving request to the database");
   }
 }
+
+export async function getCompanyName(companyName) {
+  // Query the database for companyName, carbonBalance, and cashBalance
+  const [rows] = await db.promise().query(
+    `SELECT * 
+    FROM companyaccount
+    WHERE companyName = ?`,
+    [companyName] // Pass the companyINameas a parameter
+  );
+  console.log(rows[0]);
+  return rows[0]; // Return the result of the query
+}
