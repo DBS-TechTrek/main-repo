@@ -12,6 +12,16 @@ export async function getBalance(companyId) {
   return rows; // Return the result of the query
 }
 
+export async function getAllOutstandingRequests(companyId) {
+  // Query the database for companyName, carbonBalance, and cashBalance
+  const [rows] = await db.promise().query(
+    "SELECT ca.companyName, orq.createdDatetime AS requestDate, orq.carbonUnitPrice, orq.carbonQuantity, orq.requestReason, orq.requestType FROM outstandingRequest orq JOIN companyAccount ca ON orq.companyId = ca.companyID WHERE orq.companyId != ?",
+    [companyId] // Pass the companyId as a parameter
+  );
+
+  return rows; // Return the result of the query
+}
+
 export async function editRequest({
   requestId,
   companyId,
@@ -67,4 +77,102 @@ export async function deleteRequest(id) {
     throw new Error(`Request with id ${id} not found`);
   }
   return { message: `Request with id ${id} successfully deleted` };
+}
+
+export async function createRequest(data) {
+  const {
+    companyId,
+    requestReason,
+    carbonUnitPrice,
+    requestorCompanyId,
+    requestStatus,
+    requestType,
+    createdDatetime,
+    carbonQuantity,
+  } = data;
+
+  // SQL query to insert new user into the "users" table
+  const query =
+    "INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+  try {
+    // Use the promise-based query method to execute the query
+    const [result] = await db
+      .promise()
+      .query(query, [
+        companyId,
+        requestReason,
+        carbonUnitPrice,
+        requestorCompanyId,
+        requestStatus,
+        requestType,
+        createdDatetime,
+        carbonQuantity,
+      ]);
+
+    // Return the created user with the generated id (from the result)
+    return {
+      id: result.insertId,
+      companyId,
+      requestReason,
+      carbonUnitPrice,
+      requestorCompanyId,
+      requestStatus,
+      requestType,
+      createdDatetime,
+      carbonQuantity,
+    };
+  } catch (error) {
+    console.error("Error creating data:", error);
+    throw new Error("Error saving request to the database");
+  }
+}
+
+export async function createRequest(data) {
+  const {
+    companyId,
+    requestReason,
+    carbonUnitPrice,
+    requestorCompanyId,
+    requestStatus,
+    requestType,
+    createdDatetime,
+    carbonQuantity,
+  } = data;
+
+  // SQL query to insert new user into the "users" table
+  const query =
+    "INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+  try {
+    // Use the promise-based query method to execute the query
+    const [result] = await db
+      .promise()
+      .query(query, [
+        companyId,
+        requestReason,
+        carbonUnitPrice,
+        requestorCompanyId,
+        requestStatus,
+        requestType,
+        createdDatetime,
+        carbonQuantity,
+      ]);
+
+    // Return the created user with the generated id (from the result)
+    return {
+      id: result.insertId,
+      companyId,
+      requestReason,
+      carbonUnitPrice,
+      requestorCompanyId,
+      requestStatus,
+      requestType,
+      createdDatetime,
+      carbonQuantity,
+    };
+  } catch (error) {
+    console.error("Error creating data:", error);
+    throw new Error("Error saving request to the database");
+  }
 }
