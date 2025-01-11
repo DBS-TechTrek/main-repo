@@ -12,16 +12,16 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // 简单验证
+    //
     if (!username || !password) {
       setError('Please fill in all fields');
       return;
     }
 
-    // 模拟登录成功
+    // 
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('user', username);
-    navigate('/landing'); // 修改为跳转到 landing page
+    navigate('/landing');
   };
 
   return (
