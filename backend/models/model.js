@@ -137,3 +137,21 @@ export async function createRequest(data) {
     throw new Error("Error saving request to the database");
   }
 }
+
+export async function updateStatus(id, stat) {
+  const query = `
+  UPDATE outstandingrequest
+  SET requestStatus=?
+  WHERE id=?`
+  
+  try {
+    const [result] = await db
+    .promise()
+    .query(query, [stat, id])
+
+    return result
+  } catch (err) {
+    console.error("Error updating data:", error)
+    throw new Error("Error saving status to database")
+  }
+}

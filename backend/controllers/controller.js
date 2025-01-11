@@ -4,6 +4,7 @@ import {
   getAllOutstandingRequests,
   createRequest,
   deleteRequest,
+  updateStatus
 } from "../models/model.js";
 
 // Controller function to get balance for a specific company from the request body
@@ -175,6 +176,22 @@ export async function controllerDeleteRequest(req, res) {
       return res.status(404).send("request not found");
     }
     res.send(result);
+  } catch (err) {
+    console.error("Error fetching request:", err);
+    res.status(500).send("Failed to fetch request");
+  }
+}
+
+export async function controllerUpdateStatus(req, res) {
+  console.log("req.params:", req.params);
+  const { id } = req.params;
+  const { stat } = req.body;
+  try {
+    const result = await updateStatus(id, stat)
+    if (!result) {
+      return res.status(404).send("request not found");
+    }
+    res.send(result)
   } catch (err) {
     console.error("Error fetching request:", err);
     res.status(500).send("Failed to fetch request");
