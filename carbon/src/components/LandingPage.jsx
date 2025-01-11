@@ -13,8 +13,7 @@ const LandingPage = () => {
   });
   const [requests, setRequests] = useState([]);
   const [formData, setFormData] = useState({
-    requestDate: "",
-    companyName: "",
+    requestorCompanyName: "",
     carbonUnitPrice: "",
     carbonQuantity: "",
     requestReason: "",
@@ -72,7 +71,13 @@ const LandingPage = () => {
       } else {
         console.log(formData)
         const companyName = username
-        await api.post("/createRequest", formData, companyName);
+        const requestReason = formData.requestReason
+        const carbonUnitPrice = formData.carbonUnitPrice
+        const requestorCompanyName = formData.requestorCompanyName
+        const carbonQuantity = formData.carbonQuantity
+        const requestType = formData.requestType
+
+        await api.post("/createRequest", {companyName,requestReason,carbonUnitPrice, requestorCompanyName, carbonQuantity, requestType});
       }
       setFormData({
         requestorCompanyName: "",
@@ -93,7 +98,7 @@ const LandingPage = () => {
   const handleEdit = (request) => {
     setFormData({
       requestDate: request.requestDate,
-      companyName: request.companyName,
+      requestorCompanyName: request.requestorCompanyName,
       carbonUnitPrice: request.carbonUnitPrice,
       carbonQuantity: request.carbonQuantity,
       requestReason: request.requestReason,
@@ -131,8 +136,8 @@ const LandingPage = () => {
             <label className="block font-medium">Company Name</label>
             <input
               type="text"
-              name="companyName"
-              value={formData.companyName}
+              name="requestorCompanyName"
+              value={formData.requestorCompanyName}
               onChange={handleInputChange}
               className="border border-gray-300 p-2 w-full"
               required
