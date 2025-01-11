@@ -67,21 +67,63 @@ export async function editRequest({
   }
 }
 
+export async function deleteRequest(id) {
+  const [result] = await db.promise().query(
+    `DELETE FROM outstandingrequest 
+          WHERE id = ?`,
+    [id]
+  );
+  if (result.affectedRows === 0) {
+    throw new Error(`Request with id ${id} not found`);
+  }
+  return { message: `Request with id ${id} successfully deleted` };
+}
 
 export async function createRequest(data) {
-  const { companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity } = data;
+  const {
+    companyId,
+    requestReason,
+    carbonUnitPrice,
+    requestorCompanyId,
+    requestStatus,
+    requestType,
+    createdDatetime,
+    carbonQuantity,
+  } = data;
 
   // SQL query to insert new user into the "users" table
-  const query = 'INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  const query =
+    "INSERT INTO outstandingrequest (companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   try {
     // Use the promise-based query method to execute the query
-    const [result] = await db.promise().query(query, [companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity]);
+    const [result] = await db
+      .promise()
+      .query(query, [
+        companyId,
+        requestReason,
+        carbonUnitPrice,
+        requestorCompanyId,
+        requestStatus,
+        requestType,
+        createdDatetime,
+        carbonQuantity,
+      ]);
 
     // Return the created user with the generated id (from the result)
-    return { id: result.insertId, companyId, requestReason, carbonUnitPrice, requestorCompanyId, requestStatus, requestType, createdDatetime, carbonQuantity };
+    return {
+      id: result.insertId,
+      companyId,
+      requestReason,
+      carbonUnitPrice,
+      requestorCompanyId,
+      requestStatus,
+      requestType,
+      createdDatetime,
+      carbonQuantity,
+    };
   } catch (error) {
-    console.error('Error creating data:', error);
-    throw new Error('Error saving request to the database');
+    console.error("Error creating data:", error);
+    throw new Error("Error saving request to the database");
   }
 }
